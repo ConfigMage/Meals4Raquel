@@ -1,21 +1,41 @@
 import { format, parseISO, isValid } from 'date-fns';
 
-export function formatDate(dateString: string): string {
-  const date = parseISO(dateString);
-  if (!isValid(date)) return dateString;
-  return format(date, 'MMMM d, yyyy');
+// Handle both Date objects and ISO strings from database
+function toDate(input: string | Date): Date {
+  if (input instanceof Date) {
+    return input;
+  }
+  return parseISO(input);
 }
 
-export function formatDateShort(dateString: string): string {
-  const date = parseISO(dateString);
-  if (!isValid(date)) return dateString;
-  return format(date, 'MMM d, yyyy');
+export function formatDate(dateInput: string | Date): string {
+  try {
+    const date = toDate(dateInput);
+    if (!isValid(date)) return String(dateInput);
+    return format(date, 'MMMM d, yyyy');
+  } catch {
+    return String(dateInput);
+  }
 }
 
-export function formatDateForDisplay(dateString: string): string {
-  const date = parseISO(dateString);
-  if (!isValid(date)) return dateString;
-  return format(date, 'EEEE, MMMM d, yyyy');
+export function formatDateShort(dateInput: string | Date): string {
+  try {
+    const date = toDate(dateInput);
+    if (!isValid(date)) return String(dateInput);
+    return format(date, 'MMM d, yyyy');
+  } catch {
+    return String(dateInput);
+  }
+}
+
+export function formatDateForDisplay(dateInput: string | Date): string {
+  try {
+    const date = toDate(dateInput);
+    if (!isValid(date)) return String(dateInput);
+    return format(date, 'EEEE, MMMM d, yyyy');
+  } catch {
+    return String(dateInput);
+  }
 }
 
 export function isValidEmail(email: string): boolean {
