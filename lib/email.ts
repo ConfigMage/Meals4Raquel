@@ -1,34 +1,15 @@
 import nodemailer from 'nodemailer';
-import { google } from 'googleapis';
 import { formatDate } from './utils';
 import { CourierInfo } from '@/types';
 
-async function getAccessToken(): Promise<string> {
-  const auth = new google.auth.JWT({
-    email: process.env.GMAIL_CLIENT_EMAIL,
-    key: process.env.GMAIL_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    scopes: ['https://www.googleapis.com/auth/gmail.send'],
-    subject: process.env.SENDER_EMAIL,
-  });
-
-  const { token } = await auth.getAccessToken();
-  return token || '';
-}
-
-async function createTransporter() {
-  const accessToken = await getAccessToken();
-
-  return nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      type: 'OAuth2',
-      user: process.env.SENDER_EMAIL,
-      serviceClient: process.env.GMAIL_CLIENT_EMAIL,
-      privateKey: process.env.GMAIL_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      accessToken,
-    },
-  });
-}
+// Create reusable transporter using Gmail App Password
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.SENDER_EMAIL,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
 
 export async function sendEmail(
   to: string,
@@ -36,7 +17,6 @@ export async function sendEmail(
   html: string
 ): Promise<void> {
   try {
-    const transporter = await createTransporter();
     await transporter.sendMail({
       from: `"Meals for Raquel" <${process.env.SENDER_EMAIL}>`,
       to,
