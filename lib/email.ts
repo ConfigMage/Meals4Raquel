@@ -270,3 +270,54 @@ export function generateCancellationConfirmationEmail(
     </html>
   `;
 }
+
+export function generateNewSignupNotificationEmail(
+  providerName: string,
+  providerPhone: string,
+  mealDescription: string,
+  freezerFriendly: boolean,
+  canBringToSalem: boolean,
+  noteToCourier: string | null,
+  date: string,
+  location: string,
+  totalMealsCount: number
+): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        h2 { color: #22c55e; }
+        .info-box { background: #f0fdf4; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #22c55e; }
+        .note { background: #fef3c7; padding: 10px; border-radius: 4px; margin-top: 10px; }
+        .update-box { background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 15px 0; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h2>New Meal Signup!</h2>
+        <p>A new meal has been added to your pickup route.</p>
+
+        <div class="info-box">
+          <p><strong>From:</strong> ${providerName}</p>
+          <p><strong>Phone:</strong> ${providerPhone}</p>
+          <p><strong>Meal:</strong> ${mealDescription}</p>
+          <p><strong>Freezer Friendly:</strong> ${freezerFriendly ? 'Yes' : 'No'}</p>
+          <p><strong>Can Bring to Salem:</strong> ${canBringToSalem ? 'Yes' : 'No'}</p>
+          <p><strong>Date:</strong> ${formatDate(date)}</p>
+          <p><strong>Location:</strong> ${location}</p>
+          ${noteToCourier ? `<div class="note"><strong>Note from Provider:</strong> ${noteToCourier}</div>` : ''}
+        </div>
+
+        <div class="update-box">
+          <p><strong>Total meals for ${location} on ${formatDate(date)}:</strong> ${totalMealsCount}</p>
+        </div>
+
+        <p>- The Meals for Raquel Team</p>
+      </div>
+    </body>
+    </html>
+  `;
+}

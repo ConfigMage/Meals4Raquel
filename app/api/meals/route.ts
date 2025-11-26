@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sql from '@/lib/db';
-import { sendEmail, generateConfirmationEmail } from '@/lib/email';
+import { sendEmail, generateConfirmationEmail, generateNewSignupNotificationEmail } from '@/lib/email';
 import { isValidEmail, isValidPhone } from '@/lib/utils';
 import { MealSignupFormData, MealsByLocation, MealWithLocation, Courier } from '@/types';
 
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
         AND ${pickupLocation.location} = ANY(locations)
     ` as Courier[];
 
-    // Send confirmation email
+    // Send confirmation email to the person signing up
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const cancellationUrl = `${appUrl}/cancel/${cancellationToken}`;
 
@@ -149,9 +149,43 @@ export async function POST(request: NextRequest) {
           couriers.map(c => ({ name: c.name, phone: c.phone, email: c.email }))
         )
       );
+      console.log(`Confirmation email sent to ${body.email}`);
     } catch (emailError) {
       console.error('Failed to send confirmation email:', emailError);
       // Don't fail the request if email fails
+    }
+
+    // Get total meals count for this location/date
+    const mealsCount = await sql`
+      SELECT COUNT(*) as count
+      FROM meal_signups
+      WHERE pickup_location_id = ${body.pickupLocationId}
+        AND cancelled_at IS NULL
+    `;
+    const totalMeals = parseInt(mealsCount[0].count, 10);
+
+    // Send notification to all couriers for this location
+    for (const courier of couriers) {
+      try {
+        await sendEmail(
+          courier.email,
+          `New Meal Signup - ${pickupLocation.location} - ${pickupLocation.pickup_date}`,
+          generateNewSignupNotificationEmail(
+            body.name,
+            body.phone,
+            body.mealDescription,
+            body.freezerFriendly,
+            body.canBringToSalem,
+            body.noteToCourier || null,
+            pickupLocation.pickup_date,
+            pickupLocation.location,
+            totalMeals
+          )
+        );
+        console.log(`Notification sent to courier ${courier.email}`);
+      } catch (emailError) {
+        console.error(`Failed to send notification to courier ${courier.email}:`, emailError);
+      }
     }
 
     return NextResponse.json({
