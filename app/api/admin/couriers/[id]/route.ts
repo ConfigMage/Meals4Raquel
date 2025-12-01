@@ -39,11 +39,11 @@ export async function PUT(
     }
 
     // Validate locations
-    const validLocations = ['Salem', 'Portland', 'Eugene'];
+    const validLocations = ['Salem', 'Portland', 'Eugene', 'I5 Corridor'];
     for (const loc of locations) {
       if (!validLocations.includes(loc)) {
         return NextResponse.json(
-          { error: `Invalid location: ${loc}. Must be Salem, Portland, or Eugene` },
+          { error: `Invalid location: ${loc}. Must be Salem, Portland, Eugene, or I5 Corridor` },
           { status: 400 }
         );
       }

@@ -167,8 +167,9 @@ export default function AdminDashboard() {
           className="px-3 py-2 border rounded"
         >
           <option value="">All Locations</option>
-          <option value="Salem">Salem</option>
           <option value="Portland">Portland</option>
+          <option value="I5 Corridor">I5 Corridor</option>
+          <option value="Salem">Salem</option>
           <option value="Eugene">Eugene</option>
         </select>
         <select
@@ -403,8 +404,9 @@ export default function AdminDashboard() {
                   value={locationForm.location}
                   onChange={(e) => setLocationForm({ ...locationForm, location: e.target.value })}
                 >
-                  <option value="Salem">Salem</option>
                   <option value="Portland">Portland</option>
+                  <option value="I5 Corridor">I5 Corridor</option>
+                  <option value="Salem">Salem</option>
                   <option value="Eugene">Eugene</option>
                 </select>
               </div>
@@ -467,7 +469,7 @@ export default function AdminDashboard() {
               <div>
                 <label className="block text-sm font-medium mb-1">Locations</label>
                 <div className="space-y-2">
-                  {['Salem', 'Portland', 'Eugene'].map((loc) => (
+                  {['Portland', 'I5 Corridor', 'Salem', 'Eugene'].map((loc) => (
                     <label key={loc} className="flex items-center gap-2">
                       <input
                         type="checkbox"
