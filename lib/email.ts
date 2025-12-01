@@ -77,7 +77,8 @@ export function generateConfirmationEmail(
           <p><strong>The courier will follow up to set a specific time to meet at the chosen location.</strong></p>
         </div>
 
-        <p>If you need to cancel, <a href="${cancellationUrl}" class="cancel-link">click here to cancel your meal signup</a>.</p>
+        <p>If you need to cancel, <a href="${cancellationUrl}" style="color: #dc2626; text-decoration: underline;">click here to cancel your meal signup</a>.</p>
+        <p style="font-size: 12px; color: #666;">Cancel link: ${cancellationUrl}</p>
 
         <div class="courier-info">
           <h3>Courier Contact${couriers.length > 1 ? 's' : ''}:</h3>

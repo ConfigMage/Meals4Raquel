@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sql from '@/lib/db';
 import { sendEmail, generateConfirmationEmail, generateNewSignupNotificationEmail } from '@/lib/email';
-import { isValidEmail, isValidPhone } from '@/lib/utils';
+import { isValidEmail, isValidPhone, formatDate } from '@/lib/utils';
 import { MealSignupFormData, MealsByLocation, MealWithLocation, Courier } from '@/types';
 
 export async function GET() {
@@ -140,10 +140,14 @@ export async function POST(request: NextRequest) {
       || 'http://localhost:3000';
     const cancellationUrl = `${appUrl}/cancel/${cancellationToken}`;
 
+    console.log('App URL:', appUrl);
+    console.log('Cancellation URL:', cancellationUrl);
+    console.log('Token:', cancellationToken);
+
     try {
       await sendEmail(
         body.email,
-        `Meal Drop-off Confirmation - ${pickupLocation.pickup_date}`,
+        `Meal Drop-off Confirmation - ${formatDate(pickupLocation.pickup_date)}`,
         generateConfirmationEmail(
           body.name,
           pickupLocation.pickup_date,
@@ -174,7 +178,7 @@ export async function POST(request: NextRequest) {
       try {
         await sendEmail(
           courier.email,
-          `New Meal Signup - ${pickupLocation.location} - ${pickupLocation.pickup_date}`,
+          `New Meal for Raquel - ${pickupLocation.location} ${formatDate(pickupLocation.pickup_date)}`,
           generateNewSignupNotificationEmail(
             body.name,
             body.phone,
