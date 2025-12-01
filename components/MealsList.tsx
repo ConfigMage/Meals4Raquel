@@ -28,7 +28,8 @@ export default function MealsList() {
   }, []);
 
   const renderLocation = (location: LocationKey) => {
-    const locationMeals = meals[location];
+    // Filter out cancelled meals
+    const locationMeals = meals[location].filter(meal => !meal.cancelled_at);
     const mealsByDate = groupMealsByDate(locationMeals);
     const sortedDates = Object.keys(mealsByDate).sort();
     const locInfo = getLocationInfo(location);
@@ -61,27 +62,16 @@ export default function MealsList() {
                   {mealsByDate[date].map((meal: MealWithLocation) => (
                     <div
                       key={meal.id}
-                      className={`p-3 rounded-lg border-l-4 ${
-                        meal.cancelled_at
-                          ? 'bg-red-50 border-red-400'
-                          : 'bg-green-50 border-green-400'
-                      }`}
+                      className="p-3 rounded-lg border-l-4 bg-green-50 border-green-400"
                     >
-                      <div className={meal.cancelled_at ? 'line-through text-gray-500' : ''}>
-                        <p className="font-medium">{meal.name}</p>
-                        <p className="text-sm text-gray-600">
-                          {meal.meal_description}
-                        </p>
-                        {meal.freezer_friendly && (
-                          <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">
-                            Freezer Friendly
-                          </span>
-                        )}
-                      </div>
-                      {meal.cancelled_at && (
-                        <p className="text-red-600 text-sm mt-1 font-medium">
-                          (Cancelled)
-                        </p>
+                      <p className="font-medium">{meal.name}</p>
+                      <p className="text-sm text-gray-600">
+                        {meal.meal_description}
+                      </p>
+                      {meal.freezer_friendly && (
+                        <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">
+                          Freezer Friendly
+                        </span>
                       )}
                     </div>
                   ))}

@@ -235,18 +235,6 @@ export default function MealSignupForm() {
             This meal is freezer-friendly
           </span>
         </label>
-
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="canBringToSalem"
-            checked={formData.canBringToSalem}
-            onChange={handleChange}
-          />
-          <span className="text-sm text-gray-700">
-            I can bring this meal to the Salem office if needed
-          </span>
-        </label>
       </div>
 
       <div>
@@ -268,8 +256,7 @@ export default function MealSignupForm() {
 
       <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
         <p className="text-sm text-yellow-800">
-          <strong>Important:</strong> Please drop off your meal by{' '}
-          <strong>2:00 PM</strong> on the selected date.
+          <strong>Important:</strong> The courier will schedule and contact you with a pickup time.
         </p>
       </div>
 
