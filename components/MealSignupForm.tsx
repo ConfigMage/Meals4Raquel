@@ -219,7 +219,7 @@ export default function MealSignupForm() {
           onChange={handleChange}
           required
           rows={3}
-          placeholder="Describe what you'll be bringing (e.g., Chicken casserole with rice and vegetables)"
+          placeholder="Describe the meal you'll be making, including estimated number of servings (e.g., chicken casserole with rice and vegetables, 3 servings)"
         />
       </div>
 
@@ -247,7 +247,7 @@ export default function MealSignupForm() {
           value={formData.noteToCourier}
           onChange={handleChange}
           rows={2}
-          placeholder="Any special instructions for the courier..."
+          placeholder="If selected I5 Corridor location, please include your rough location here."
         />
         <p className="text-sm text-gray-500 mt-1">
           This note will only be visible to couriers.
@@ -256,7 +256,7 @@ export default function MealSignupForm() {
 
       <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
         <p className="text-sm text-yellow-800">
-          <strong>Important:</strong> The courier will schedule and contact you with a pickup time.
+          The courier will follow up to set a specific time to meet at the chosen location.
         </p>
       </div>
 
