@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import sql from '@/lib/db';
 import { ALLOWED_DATES } from '@/lib/locations';
 
@@ -50,9 +50,61 @@ export async function POST() {
 }
 
 export async function GET() {
-  return NextResponse.json({
-    message: 'POST to this endpoint to seed all pickup locations',
-    dates: ALLOWED_DATES,
-    locations: LOCATIONS,
-  });
+  try {
+    // List all pickup locations
+    const locations = await sql`
+      SELECT id, pickup_date, location, active, created_at
+      FROM pickup_locations
+      ORDER BY pickup_date ASC, location ASC
+    `;
+
+    return NextResponse.json({
+      message: 'Current pickup locations. POST to seed, DELETE to clear all.',
+      count: locations.length,
+      locations,
+      allowedDates: ALLOWED_DATES,
+      allowedLocations: LOCATIONS,
+    });
+  } catch (error) {
+    console.error('Error fetching locations:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch locations' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const url = new URL(request.url);
+    const confirm = url.searchParams.get('confirm');
+
+    if (confirm !== 'yes') {
+      return NextResponse.json({
+        message: 'Add ?confirm=yes to delete all pickup locations without meal signups',
+        warning: 'This will delete all pickup locations that have no meal signups',
+      });
+    }
+
+    // Delete only locations without any signups
+    const result = await sql`
+      DELETE FROM pickup_locations
+      WHERE id NOT IN (
+        SELECT DISTINCT pickup_location_id FROM meal_signups
+      )
+      RETURNING id, pickup_date, location
+    `;
+
+    return NextResponse.json({
+      success: true,
+      message: `Deleted ${result.length} pickup locations`,
+      deleted: result,
+    });
+  } catch (error) {
+    console.error('Error deleting locations:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete locations', details: String(error) },
+      { status: 500 }
+    );
+  }
 }

@@ -42,9 +42,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!['Salem', 'Portland', 'Eugene'].includes(location)) {
+    if (!['Salem', 'Portland', 'Eugene', 'I5 Corridor'].includes(location)) {
       return NextResponse.json(
-        { error: 'Invalid location. Must be Salem, Portland, or Eugene' },
+        { error: 'Invalid location. Must be Salem, Portland, Eugene, or I5 Corridor' },
         { status: 400 }
       );
     }

@@ -23,10 +23,25 @@ export async function PUT(
       );
     }
 
-    if (!['Salem', 'Portland', 'Eugene'].includes(location)) {
+    if (!['Salem', 'Portland', 'Eugene', 'I5 Corridor'].includes(location)) {
       return NextResponse.json(
-        { error: 'Invalid location. Must be Salem, Portland, or Eugene' },
+        { error: 'Invalid location. Must be Salem, Portland, Eugene, or I5 Corridor' },
         { status: 400 }
+      );
+    }
+
+    // Check if another record with the same date/location exists
+    const existing = await sql`
+      SELECT id FROM pickup_locations
+      WHERE pickup_date = ${pickupDate}::date
+        AND location = ${location}
+        AND id != ${id}
+    `;
+
+    if (existing.length > 0) {
+      return NextResponse.json(
+        { error: `A pickup location for ${location} on ${pickupDate} already exists` },
+        { status: 409 }
       );
     }
 
