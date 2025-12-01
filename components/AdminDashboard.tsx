@@ -126,6 +126,12 @@ export default function AdminDashboard() {
     loadData();
   };
 
+  const handleDeleteMeal = async (id: number) => {
+    if (!confirm('Are you sure you want to permanently delete this meal signup? This cannot be undone.')) return;
+    await fetch(`/api/admin/meals/${id}`, { method: 'DELETE' });
+    loadData();
+  };
+
   const openLocationModal = (location?: PickupLocation) => {
     if (location) {
       setEditingLocation(location);
@@ -195,6 +201,7 @@ export default function AdminDashboard() {
               <th>Email</th>
               <th>Freezer</th>
               <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -217,6 +224,14 @@ export default function AdminDashboard() {
                       Active
                     </span>
                   )}
+                </td>
+                <td>
+                  <button
+                    onClick={() => handleDeleteMeal(meal.id)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
