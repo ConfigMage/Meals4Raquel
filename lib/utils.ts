@@ -1,11 +1,20 @@
-import { format, parseISO, isValid } from 'date-fns';
+import { format, isValid } from 'date-fns';
 
 // Handle both Date objects and ISO strings from database
+// Parses dates as local dates to avoid timezone shifting
 function toDate(input: string | Date): Date {
   if (input instanceof Date) {
-    return input;
+    // For Date objects, extract the UTC date parts to avoid timezone shift
+    const year = input.getUTCFullYear();
+    const month = input.getUTCMonth();
+    const day = input.getUTCDate();
+    return new Date(year, month, day);
   }
-  return parseISO(input);
+
+  // For strings, parse as local date
+  const dateStr = String(input).split('T')[0]; // Get just the date part
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day); // month is 0-indexed
 }
 
 export function formatDate(dateInput: string | Date): string {
