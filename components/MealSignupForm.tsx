@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { PickupLocation, MealSignupFormData } from '@/types';
 import { formatDate } from '@/lib/utils';
+import { ALLOWED_DATES, getLocationInfo } from '@/lib/locations';
 
 export default function MealSignupForm() {
   const [pickupLocations, setPickupLocations] = useState<PickupLocation[]>([]);
@@ -76,12 +77,23 @@ export default function MealSignupForm() {
     }));
   };
 
-  // Group pickup locations by date
-  const locationsByDate = pickupLocations.reduce((acc, loc) => {
-    if (!acc[loc.pickup_date]) {
-      acc[loc.pickup_date] = [];
+  // Filter to only allowed dates and group by date
+  const filteredLocations = pickupLocations.filter((loc) => {
+    // Normalize the date to YYYY-MM-DD format for comparison
+    const dateStr = typeof loc.pickup_date === 'string'
+      ? loc.pickup_date.split('T')[0]
+      : new Date(loc.pickup_date).toISOString().split('T')[0];
+    return ALLOWED_DATES.includes(dateStr);
+  });
+
+  const locationsByDate = filteredLocations.reduce((acc, loc) => {
+    const dateStr = typeof loc.pickup_date === 'string'
+      ? loc.pickup_date.split('T')[0]
+      : new Date(loc.pickup_date).toISOString().split('T')[0];
+    if (!acc[dateStr]) {
+      acc[dateStr] = [];
     }
-    acc[loc.pickup_date].push(loc);
+    acc[dateStr].push(loc);
     return acc;
   }, {} as Record<string, PickupLocation[]>);
 
@@ -176,15 +188,23 @@ export default function MealSignupForm() {
           required
         >
           <option value="">Select a date and location</option>
-          {Object.entries(locationsByDate).map(([date, locations]) => (
-            <optgroup key={date} label={formatDate(date)}>
-              {locations.map((loc) => (
-                <option key={loc.id} value={loc.id}>
-                  {loc.location}
-                </option>
-              ))}
-            </optgroup>
-          ))}
+          {Object.entries(locationsByDate)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([date, locations]) => (
+              <optgroup key={date} label={formatDate(date)}>
+                {locations.map((loc) => {
+                  const locInfo = getLocationInfo(loc.location);
+                  const displayText = locInfo
+                    ? `${loc.location}: ${locInfo.name}${locInfo.note ? ` (${locInfo.note})` : ''}`
+                    : loc.location;
+                  return (
+                    <option key={loc.id} value={loc.id}>
+                      {displayText}
+                    </option>
+                  );
+                })}
+              </optgroup>
+            ))}
         </select>
       </div>
 

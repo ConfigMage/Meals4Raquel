@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react';
 import { MealsByLocation, MealWithLocation } from '@/types';
 import { formatDate, groupMealsByDate } from '@/lib/utils';
+import { getLocationInfo, LocationKey } from '@/lib/locations';
 
 export default function MealsList() {
   const [meals, setMeals] = useState<MealsByLocation>({
     Salem: [],
     Portland: [],
     Eugene: [],
+    'I5 Corridor': [],
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -25,15 +27,24 @@ export default function MealsList() {
       });
   }, []);
 
-  const renderLocation = (location: 'Salem' | 'Portland' | 'Eugene') => {
+  const renderLocation = (location: LocationKey) => {
     const locationMeals = meals[location];
     const mealsByDate = groupMealsByDate(locationMeals);
     const sortedDates = Object.keys(mealsByDate).sort();
+    const locInfo = getLocationInfo(location);
 
     return (
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="bg-blue-600 text-white px-4 py-3">
           <h2 className="text-xl font-bold">{location}</h2>
+          {locInfo && (
+            <div className="text-sm text-blue-100 mt-1">
+              <p>{locInfo.name}</p>
+              <p>{locInfo.address}</p>
+              {locInfo.city && <p>{locInfo.city}</p>}
+              {locInfo.note && <p className="italic">{locInfo.note}</p>}
+            </div>
+          )}
         </div>
         <div className="p-4">
           {sortedDates.length === 0 ? (
@@ -95,15 +106,15 @@ export default function MealsList() {
     <div>
       <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-r-lg">
         <p className="text-sm text-yellow-800">
-          <strong>Important:</strong> All meals should be dropped off no later than{' '}
-          <strong>2:00 PM</strong> at the specified location. If this is not possible,
-          please contact the courier.
+          <strong>Important:</strong> The courier will follow up to set a specific
+          time to meet at the chosen location.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {renderLocation('Salem')}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {renderLocation('Portland')}
+        {renderLocation('I5 Corridor')}
+        {renderLocation('Salem')}
         {renderLocation('Eugene')}
       </div>
     </div>

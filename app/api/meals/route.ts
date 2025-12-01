@@ -31,6 +31,7 @@ export async function GET() {
       Salem: [],
       Portland: [],
       Eugene: [],
+      'I5 Corridor': [],
     };
 
     for (const meal of meals) {
@@ -132,7 +133,11 @@ export async function POST(request: NextRequest) {
     ` as Courier[];
 
     // Send confirmation email to the person signing up
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    // Try to get the app URL from environment, or construct from Vercel system env vars
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL
+      || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null)
+      || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : null)
+      || 'http://localhost:3000';
     const cancellationUrl = `${appUrl}/cancel/${cancellationToken}`;
 
     try {

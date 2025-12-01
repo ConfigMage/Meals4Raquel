@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import { formatDate } from './utils';
 import { CourierInfo } from '@/types';
+import { getLocationInfo } from './locations';
 
 // Create reusable transporter using Gmail App Password
 const transporter = nodemailer.createTransport({
@@ -39,6 +40,13 @@ export function generateConfirmationEmail(
   cancellationUrl: string,
   couriers: CourierInfo[]
 ): string {
+  const locInfo = getLocationInfo(location);
+  const addressHtml = locInfo
+    ? `<p><strong>Location:</strong> ${location}</p>
+       <p><strong>Address:</strong><br>${locInfo.fullAddress.replace(/\n/g, '<br>')}</p>
+       ${locInfo.note ? `<p><em>${locInfo.note}</em></p>` : ''}`
+    : `<p><strong>Location:</strong> ${location}</p>`;
+
   return `
     <!DOCTYPE html>
     <html>
@@ -60,13 +68,13 @@ export function generateConfirmationEmail(
 
         <div class="info-box">
           <p><strong>Date:</strong> ${formatDate(date)}</p>
-          <p><strong>Location:</strong> ${location}</p>
+          ${addressHtml}
           <p><strong>Meal:</strong> ${mealDescription}</p>
           <p><strong>Freezer Friendly:</strong> ${freezerFriendly ? 'Yes' : 'No'}</p>
         </div>
 
         <div class="highlight">
-          <p><strong>Please drop off by 2:00 PM</strong> at the ${location} location.</p>
+          <p><strong>The courier will follow up to set a specific time to meet at the chosen location.</strong></p>
         </div>
 
         <p>If you need to cancel, <a href="${cancellationUrl}" class="cancel-link">click here to cancel your meal signup</a>.</p>
@@ -91,6 +99,13 @@ export function generateReminderEmail(
   mealDescription: string,
   couriers: CourierInfo[]
 ): string {
+  const locInfo = getLocationInfo(location);
+  const addressHtml = locInfo
+    ? `<p><strong>Location:</strong> ${location}</p>
+       <p><strong>Address:</strong><br>${locInfo.fullAddress.replace(/\n/g, '<br>')}</p>
+       ${locInfo.note ? `<p><em>${locInfo.note}</em></p>` : ''}`
+    : `<p><strong>Location:</strong> ${location}</p>`;
+
   return `
     <!DOCTYPE html>
     <html>
@@ -112,12 +127,12 @@ export function generateReminderEmail(
 
         <div class="info-box">
           <p><strong>Date:</strong> ${formatDate(date)}</p>
-          <p><strong>Location:</strong> ${location}</p>
+          ${addressHtml}
           <p><strong>Your Meal:</strong> ${mealDescription}</p>
         </div>
 
         <div class="highlight">
-          <p><strong>Please drop off by 2:00 PM</strong> at the ${location} location.</p>
+          <p><strong>The courier will follow up to set a specific time to meet at the chosen location.</strong></p>
         </div>
 
         <div class="courier-info">

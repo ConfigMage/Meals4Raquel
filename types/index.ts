@@ -1,7 +1,7 @@
 export interface PickupLocation {
   id: number;
   pickup_date: string;
-  location: 'Salem' | 'Portland' | 'Eugene';
+  location: 'Salem' | 'Portland' | 'Eugene' | 'I5 Corridor';
   active: boolean;
   created_at: string;
 }
@@ -49,6 +49,7 @@ export interface MealsByLocation {
   Salem: MealWithLocation[];
   Portland: MealWithLocation[];
   Eugene: MealWithLocation[];
+  'I5 Corridor': MealWithLocation[];
 }
 
 export interface MealWithLocation extends MealSignup {
